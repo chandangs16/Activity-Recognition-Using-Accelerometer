@@ -68,8 +68,8 @@ public class AccIntentService  extends Service implements SensorEventListener {
             numSamples++;
             long now = System.currentTimeMillis();
             if (//now > startTime + 5000 &
-                    numSamples > 10) {
-                    samplingRate = numSamples / ((now - startTime) / 1000.0);
+                    numSamples > 50) {
+//                    samplingRate = numSamples / ((now - startTime) / 1000.0);
                     isActive = false;
                     Message msg = handler.obtainMessage();
                     float[] xAccelArray = new float[accelArray.get(0).size()];
