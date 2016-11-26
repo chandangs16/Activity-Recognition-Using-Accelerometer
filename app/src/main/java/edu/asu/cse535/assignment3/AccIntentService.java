@@ -32,72 +32,88 @@ public class AccIntentService  extends Service implements SensorEventListener {
     public Handler handler;
     private Sensor sensor;
     private SensorManager sensorManager;
-    long lastSaved;
-    private long sensorReferenceTime;
-//    static int ACCE_FILTER_DATA_MIN_TIME = 1000;
-    private long startTime;
+    private final int SAMPLE_SIZE = 150;
+    int xvalues[];
+    int yvalues[];
+    int zvalues[];
+
     private int numSamples = 0;
     private boolean isActive = false;
     private double samplingRate = 0.0;
     public ArrayList<ArrayList<Float>> accelArray = new ArrayList<>();
 
-    public AccIntentService(){
+    public AccIntentService() {
+        xvalues = new int[SAMPLE_SIZE];
+        yvalues = new int[SAMPLE_SIZE];
+        zvalues = new int[SAMPLE_SIZE];
+    }
+
+    public class LocalBinder extends Binder {
+        public AccIntentService getInstance() {
+            return AccIntentService.this;
+        }
+    }
+
+    public void onCreate() {
+        Log.w(this.getClass().getSimpleName(), " OnCreate");
+
+        sensorManager = (SensorManager)  getSystemService(Context.SENSOR_SERVICE);
+        sensor  = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        sensorManager.registerListener((SensorEventListener) this, sensor, 100000);
 
     }
 
     public void startRecording() {
-        startTime = System.currentTimeMillis();
+
         numSamples = 0;
         isActive = true;
     }
+
     public boolean isActive() {
         return isActive;
     }
 
-
     @Override
     public void onSensorChanged(SensorEvent event) {
 
-        if (handler !=null && isActive()) {
-            lastSaved = System.currentTimeMillis();
+        if (handler != null && isActive()) {
+
             float x = event.values[0];
             float y = event.values[1];
             float z = event.values[2];
 
-
             numSamples++;
             long now = System.currentTimeMillis();
-            if (//now > startTime + 5000 &
-                    numSamples > 50) {
-//                    samplingRate = numSamples / ((now - startTime) / 1000.0);
-                    isActive = false;
-                    Message msg = handler.obtainMessage();
-                    float[] xAccelArray = new float[accelArray.get(0).size()];
-                    float[] yAccelArray = new float[accelArray.get(1).size()];
-                    float[] zAccelArray = new float[accelArray.get(2).size()];
-                    int i = 0;
-                    for(Float f: accelArray.get(0)){
-                        xAccelArray[i++] = (f != null ? f : 0.0f);
-                    }
-                    i = 0;
-                    for(Float f: accelArray.get(1)) {
-                        yAccelArray[i++] = (f != null ? f : 0.0f);
-                    }
-                    i = 0;
-                    for(Float f: accelArray.get(3)) {
-                        zAccelArray[i++] = (f != null ? f: 0.0f);
-                    }
+            if (numSamples > 50) {
 
-                    Bundle b = new Bundle();
-                    b.putFloatArray("XAccelVals", xAccelArray);
-                    b.putFloatArray("YAccelVals", yAccelArray);
-                    b.putFloatArray("ZAccelVals", zAccelArray);
-                    msg.setData(b);
-                    handler.sendMessage(msg);
-                    numSamples = 0;
-                    accelArray.get(0).clear();
-                    accelArray.get(1).clear();
-                    accelArray.get(2).clear();
+                isActive = false;
+                Message msg = handler.obtainMessage();
+                float[] xAccelArray = new float[accelArray.get(0).size()];
+                float[] yAccelArray = new float[accelArray.get(1).size()];
+                float[] zAccelArray = new float[accelArray.get(2).size()];
+                int i = 0;
+                for(Float f: accelArray.get(0)){
+                    xAccelArray[i++] = (f != null ? f : 0.0f);
+                }
+                i = 0;
+                for(Float f: accelArray.get(1)) {
+                    yAccelArray[i++] = (f != null ? f : 0.0f);
+                }
+                i = 0;
+                for(Float f: accelArray.get(3)) {
+                    zAccelArray[i++] = (f != null ? f: 0.0f);
+                }
+
+                Bundle b = new Bundle();
+                b.putFloatArray("XAccelVals", xAccelArray);
+                b.putFloatArray("YAccelVals", yAccelArray);
+                b.putFloatArray("ZAccelVals", zAccelArray);
+                msg.setData(b);
+                handler.sendMessage(msg);
+                numSamples = 0;
+                accelArray.get(0).clear();
+                accelArray.get(1).clear();
+                accelArray.get(2).clear();
 
             }
             else{
@@ -106,17 +122,6 @@ public class AccIntentService  extends Service implements SensorEventListener {
                 accelArray.get(2).add(z);
 
             }
-
-
-
-
-
-//            b.putString("timestamp", String.valueOf(lastSaved));
-//            b.putFloat("xvalue", x);
-//            b.putFloat("yvalue", y);
-//            b.putFloat("zvalue",z);
-//            msg.setData(b);
-//            handler.sendMessage(msg);
         }
     }
 
@@ -128,26 +133,5 @@ public class AccIntentService  extends Service implements SensorEventListener {
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
-    }
-
-    public class LocalBinder extends Binder
-    {
-        public AccIntentService getInstance()
-        {
-            return AccIntentService.this;
-        }
-    }
-    public void onCreate() {
-        Log.w("Tag: ", "on create called");
-        lastSaved = System.currentTimeMillis();
-        sensorManager = (SensorManager)  getSystemService(Context.SENSOR_SERVICE);
-        sensor  = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sensorManager.registerListener((SensorEventListener) this, sensor, 100000);
-        sensorReferenceTime = System.currentTimeMillis();
-    }
-
-    public void setHandler(Handler handler)
-    {
-        this.handler = handler;
     }
 }
