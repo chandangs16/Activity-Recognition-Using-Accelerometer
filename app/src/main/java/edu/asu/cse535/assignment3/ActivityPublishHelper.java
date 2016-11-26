@@ -72,6 +72,7 @@ public class ActivityPublishHelper {
             data.append(activityData.getZ_values()[i]);
             data.append(" ");
         }
+        data.append("\n");
         return data.toString();
     }
 
