@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Assignment3</string>
+    <string name="hello">Hello World, AndroidLibsvmExampleActivity!</string>
 </resources>

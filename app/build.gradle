@@ -16,7 +16,15 @@ android {
             ldLibs "log"
         }
 
+
     }
+
+    externalNativeBuild {
+        ndkBuild {
+            path 'src/main/jni/Android.mk'
+        }
+    }
+
     buildTypes {
         release {
             minifyEnabled false
