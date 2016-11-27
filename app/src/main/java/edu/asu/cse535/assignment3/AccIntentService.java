@@ -15,6 +15,8 @@ import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.security.Timestamp;
+
 public class AccIntentService  extends Service implements SensorEventListener {
     public final IBinder localBinder = new LocalBinder();
     public Handler handler;
@@ -27,6 +29,7 @@ public class AccIntentService  extends Service implements SensorEventListener {
     float zvalues[];
     String activity = "";
     Intent parentIntent;
+    long previousTimestamp;
 
     public AccIntentService() {
     }
@@ -39,6 +42,7 @@ public class AccIntentService  extends Service implements SensorEventListener {
         zvalues = new float[SAMPLE_SIZE];
         this.parentIntent = intent;
         this.activity = intent.getStringExtra("activity");
+        previousTimestamp = System.currentTimeMillis();
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -64,13 +68,17 @@ public class AccIntentService  extends Service implements SensorEventListener {
             float z = event.values[2];
 
             if (count < 50) {
-                Log.w(this.getClass().getSimpleName() , "Values getting added to array" + String.valueOf(count));
-                xvalues[count] = x;
-                yvalues[count] = y;
-                zvalues[count] = z;
-                count++;
+                long currentTimestamp = System.currentTimeMillis();
+                if (currentTimestamp-previousTimestamp >= 100) {
+                    previousTimestamp = currentTimestamp;
+                    Log.w(this.getClass().getSimpleName() , "Values getting added to array" + String.valueOf(count));
+                    xvalues[count] = x;
+                    yvalues[count] = y;
+                    zvalues[count] = z;
+                    count++;
+                }
             }
-            else{
+            else {
                 Log.w(this.getClass().getSimpleName() , " Finished collecting activity data");
                 // stop the service after the completion of this if.
                 ActivityData activityData = new ActivityData(xvalues, yvalues, zvalues, activity);
@@ -110,11 +118,4 @@ public class AccIntentService  extends Service implements SensorEventListener {
 
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Toast.makeText(this, "service onDestroy", Toast.LENGTH_LONG).show();
-//        Utils.cancelNotification(this);
-        handler.removeCallbacksAndMessages(null);
-    }
 }
