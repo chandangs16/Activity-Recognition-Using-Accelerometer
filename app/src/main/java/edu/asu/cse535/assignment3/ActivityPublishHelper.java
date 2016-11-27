@@ -4,8 +4,11 @@ import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
 
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 
@@ -25,36 +28,29 @@ public class ActivityPublishHelper {
         writeToFile(formatData(this.activityData), this.context);
     }
 
-    private boolean fileExists() {
-        File file = new File(Environment.getExternalStorageDirectory().getAbsolutePath() + "/Download/" + TRAINING_DATA_SET);
-        if(!file.exists()) {
-            try {
-                file.createNewFile();
-            }
-            catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        return true;
-    }
+
 
 
     public boolean writeToFile(String data,Context context) {
-        if(fileExists()) {
-            try {
-                OutputStreamWriter outputStreamWriter = new OutputStreamWriter(context.openFileOutput(Environment.getExternalStorageDirectory().getAbsolutePath()+"/Download"+TRAINING_DATA_SET, Context.MODE_APPEND));
-                outputStreamWriter.write(data);
-                outputStreamWriter.close();
-                return true;
-            }
-            catch (IOException e) {
-                Log.e("IOException", "File write failed: " + e.toString());
-                e.printStackTrace();
+        try {
 
-            }
+                File external = Environment.getExternalStorageDirectory();
+                String sdcardPath = external.getPath();
+                File file = new File(sdcardPath + "/Download/"+TRAINING_DATA_SET);
+                file.createNewFile();
+                FileWriter filewriter = new FileWriter(file, true);
+                BufferedWriter out = new BufferedWriter(filewriter);
+
+                out.write(data);
+
+                out.close();
+                filewriter.close();
+                return true;
+
+        } catch (Exception e) {
+            android.util.Log.d("failed to save file", e.toString());
         }
         return false;
-
     }
 
     private String formatData(ActivityData activityData) {
@@ -72,15 +68,15 @@ public class ActivityPublishHelper {
             data.append(activityData.getZ_values()[i]);
             data.append(" ");
         }
-        data.append("\n");
+        data.append(System.lineSeparator());
         return data.toString();
     }
 
     private int getLabel(String label){
         switch(label){
-            case "eating": return 1;
-            case "walking": return 2;
-            case "running": return 3;
+            case "Eating": return 1;
+            case "Walking": return 2;
+            case "Running": return 3;
             default: return 0;
         }
     }

@@ -30,6 +30,7 @@ public class AccIntentService  extends Service implements SensorEventListener {
     String activity = "";
     Intent parentIntent;
     long previousTimestamp;
+    boolean serviceBound;
 
     public AccIntentService() {
     }
@@ -42,7 +43,9 @@ public class AccIntentService  extends Service implements SensorEventListener {
         zvalues = new float[SAMPLE_SIZE];
         this.parentIntent = intent;
         this.activity = intent.getStringExtra("activity");
+        sensorManager.registerListener((SensorEventListener) this, sensor, 1000000);
         previousTimestamp = System.currentTimeMillis();
+        serviceBound = true;
         return super.onStartCommand(intent, flags, startId);
     }
 
@@ -52,17 +55,21 @@ public class AccIntentService  extends Service implements SensorEventListener {
         }
     }
 
+
+    @Override
     public void onCreate() {
+        super.onCreate();
         Log.w(this.getClass().getSimpleName(), " Service is created");
         sensorManager = (SensorManager)  getSystemService(Context.SENSOR_SERVICE);
         sensor  = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sensorManager.registerListener((SensorEventListener) this, sensor, 1000000);
+
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
         Log.w(this.getClass().getSimpleName() , "Value sensed");
-        if (handler != null ) {
+        if (handler != null && serviceBound) {
+
             float x = event.values[0];
             float y = event.values[1];
             float z = event.values[2];
@@ -95,9 +102,11 @@ public class AccIntentService  extends Service implements SensorEventListener {
 
                 handler.sendMessage(msg);
                 count = 0;
-                stopSelf();
+                sensorManager.unregisterListener(this, sensor);
+                serviceBound = false;
             }
         }
+
     }
 
 
@@ -117,5 +126,13 @@ public class AccIntentService  extends Service implements SensorEventListener {
         this.handler = handler;
 
     }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        handler.removeCallbacksAndMessages(null);
+
+    }
+
 
 }
