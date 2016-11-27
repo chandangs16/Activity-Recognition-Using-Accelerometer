@@ -7,6 +7,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
+import android.net.Uri;
+import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -17,6 +21,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
+import java.io.File;
 import java.sql.Timestamp;
 import java.util.Date;
 
@@ -46,18 +51,28 @@ public class MainActivity extends AppCompatActivity {
                 // check if the built message will be sent to the queue if stopself is called
                 // before sendig the message.
                 Log.w(this.getClass().getSimpleName() , "Message received and stopping service");
-                stopAccService();
-//                accIntentService.stopSelf();
+
                 Bundle b = msg.getData();
                 ActivityData activityData = (ActivityData) b.getSerializable("ActivityData");
                 Log.w(this.getClass().getSimpleName() , "The data for " + activityData.getActivity() + " will be added to database");
                 activityDatabaseHandler.addActivityToDatabase(activityData);
-//                unbindService(serve);
-                stopService(intent);
+                stopAccService();
+
+                notifyCompletion();
                 Toast.makeText(MainActivity.this, "Activity added to Database", Toast.LENGTH_SHORT).show();
                 Log.w("writeToFile", new ActivityPublishHelper(activityData, getApplicationContext()).toString());
             }
         };
+    }
+
+    public void notifyCompletion() {
+        try {
+            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            Ringtone r = RingtoneManager.getRingtone(getApplicationContext(), notification);
+            r.play();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public void stopAccService() {
@@ -65,10 +80,54 @@ public class MainActivity extends AppCompatActivity {
         this.unbindService(serve);
     }
 
+    public void onStartRecordingRunning(View v) {
+        Log.w(this.getClass().getSimpleName() , "Button is clicked");
+        intent = new Intent(MainActivity.this.getBaseContext(), AccIntentService.class);
+        intent.putExtra("activity", Constants.ACTIVITY_RUNNING);
+        startService(intent);
+        serve = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                accIntentService = ((AccIntentService.LocalBinder) service).getInstance();
+                accIntentService.setHandler(handler);
+                Log.w(this.getClass().getSimpleName() , "Activity is connected to service");
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+
+            }
+        };
+
+        bindService(intent, serve, Context.BIND_AUTO_CREATE);
+    }
+
     public void onStartRecordingEating(View v) {
         Log.w(this.getClass().getSimpleName() , "Button is clicked");
         intent = new Intent(MainActivity.this.getBaseContext(), AccIntentService.class);
-        intent.putExtra("activity", "Eating");
+        intent.putExtra("activity", Constants.ACTIVITY_EATING);
+        startService(intent);
+        serve = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                accIntentService = ((AccIntentService.LocalBinder) service).getInstance();
+                accIntentService.setHandler(handler);
+                Log.w(this.getClass().getSimpleName() , "Activity is connected to service");
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+
+            }
+        };
+
+        bindService(intent, serve, Context.BIND_AUTO_CREATE);
+    }
+
+    public void onStartRecordingWalking(View v) {
+        Log.w(this.getClass().getSimpleName() , "Button is clicked");
+        intent = new Intent(MainActivity.this.getBaseContext(), AccIntentService.class);
+        intent.putExtra("activity", Constants.ACTIVITY_WALKING);
         startService(intent);
         serve = new ServiceConnection() {
             @Override
@@ -93,6 +152,17 @@ public class MainActivity extends AppCompatActivity {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
+
+    public void clearData(View v) {
+        if(activityDatabaseHandler !=null) {
+            activityDatabaseHandler.deleteAllActivityDataFromDatabase();
+        }
+
+        File file = new File(Constants.TRAINING_DATA_FILE);
+        file.delete();
+        Toast.makeText(this, "Activity data cleared from database", Toast.LENGTH_SHORT).show();
+        Log.w(this.getClass().getSimpleName(), "Data cleared from database");
+    }
 
     /**
      * Checks if the app has permission to write to device storage

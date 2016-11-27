@@ -40,7 +40,9 @@ public class ActivityDatabaseContract {
         stringBuilder.append(SPACE);
 
         //id primary key autoincrement
-        stringBuilder.append("ID INTEGER PRIMARY KEY AUTOINCREMENT");
+        stringBuilder.append(ActivityEntry.ID);
+        stringBuilder.append(SPACE);
+        stringBuilder.append("INTEGER PRIMARY KEY AUTOINCREMENT");
         stringBuilder.append(COMMA);
         stringBuilder.append(SPACE);
         // build the query
@@ -80,6 +82,7 @@ public class ActivityDatabaseContract {
 
     public static abstract class ActivityEntry {
         public static final String TABLE_NAME = "ACTIVITY_TABLE";
+        public static final String ID = "ID";
         public static String TABLE_COLUMN_QUERY_STRING = "";
         public static final String ACCEL_X = "ACCEL_X";
         public static final String ACCEL_Y = "ACCEL_Y";

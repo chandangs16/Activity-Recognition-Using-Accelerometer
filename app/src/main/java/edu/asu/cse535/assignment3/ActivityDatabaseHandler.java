@@ -119,6 +119,27 @@ public class ActivityDatabaseHandler extends SQLiteOpenHelper {
     }
 
     /**
+     * Deletes the movie description from the database.
+     *
+     * @return Returns true if deletion is successful else returns false.
+     */
+    public boolean deleteAllActivityDataFromDatabase() {
+        SQLiteDatabase db = getWritableDatabase();
+
+        db.execSQL("DELETE FROM " + ActivityDatabaseContract.ActivityEntry.TABLE_NAME);
+        db.close();
+        return true;
+//        int rowCount = db.delete(ActivityDatabaseContract.ActivityEntry.TABLE_NAME, ActivityDatabaseContract.ActivityEntry.ID + " = ? ", new String[]{"*"});
+
+
+//        if (rowCount == 0) {
+//            return false;
+//        } else {
+//            return true;
+//        }
+    }
+
+    /**
      * Fetches the movie description from the database.
      *
      * @param movieId The Id of the movie.

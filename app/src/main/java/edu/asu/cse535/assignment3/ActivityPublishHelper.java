@@ -18,8 +18,6 @@ import java.io.OutputStreamWriter;
 
 public class ActivityPublishHelper {
     public ActivityData activityData;
-    private String TRAINING_DATA_SET = "training_data";
-    public String MODEL_FILE = "model";
     public Context context;
 
     public ActivityPublishHelper(ActivityData activityData, Context context) {
@@ -28,15 +26,9 @@ public class ActivityPublishHelper {
         writeToFile(formatData(this.activityData), this.context);
     }
 
-
-
-
     public boolean writeToFile(String data,Context context) {
         try {
-
-                File external = Environment.getExternalStorageDirectory();
-                String sdcardPath = external.getPath();
-                File file = new File(sdcardPath + "/Download/"+TRAINING_DATA_SET);
+                File file = new File(Constants.TRAINING_DATA_FILE);
                 file.createNewFile();
                 FileWriter filewriter = new FileWriter(file, true);
                 BufferedWriter out = new BufferedWriter(filewriter);
@@ -74,9 +66,9 @@ public class ActivityPublishHelper {
 
     private int getLabel(String label){
         switch(label){
-            case "Eating": return 1;
-            case "Walking": return 2;
-            case "Running": return 3;
+            case Constants.ACTIVITY_EATING: return 1;
+            case Constants.ACTIVITY_WALKING: return 2;
+            case Constants.ACTIVITY_RUNNING: return 3;
             default: return 0;
         }
     }
