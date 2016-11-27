@@ -44,7 +44,7 @@ public class ActivityDatabaseContract {
         stringBuilder.append(COMMA);
         stringBuilder.append(SPACE);
         // build the query
-        for(int i=1;i<=150;i++) {
+        for(int i=1;i<=50;i++) {
             // x value
             stringBuilder.append(ACCEL_X);
             stringBuilder.append(i);

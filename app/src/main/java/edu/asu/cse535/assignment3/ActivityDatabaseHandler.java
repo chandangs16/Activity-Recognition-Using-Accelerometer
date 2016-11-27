@@ -33,7 +33,7 @@ import java.io.IOException;
 public class ActivityDatabaseHandler extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "Activity_Description.db";
     private static final int DATABASE_VERSION = 1;
-    private final String DATABASE_PATH = "/data/data/gnayak2.msse.asu.edu.assignment3/databases/";
+    private final String DATABASE_PATH = "/data/data/edu.asu.cse535.assignment3/databases/";
     private Context context;
 
     public ActivityDatabaseHandler(Context context) {
@@ -57,6 +57,7 @@ public class ActivityDatabaseHandler extends SQLiteOpenHelper {
         Log.w(this.getClass().getSimpleName(), " OnCreate");
         db.execSQL(ActivityDatabaseContract.ActivityEntry.TABLE_COLUMN_QUERY_STRING);
         Log.w(this.getClass().getSimpleName(), " Table is created");
+        Log.w("Database Query: ", ActivityDatabaseContract.ActivityEntry.TABLE_COLUMN_QUERY_STRING);
     }
 
     /**
@@ -90,8 +91,10 @@ public class ActivityDatabaseHandler extends SQLiteOpenHelper {
 
         if (responseValue == -1) {
             // Also it may fail because of unique ID. Handle this case.
+            Log.w(this.getClass().getSimpleName() , "Failed to add values to database");
             return false;
         } else {
+            Log.w(this.getClass().getSimpleName() , "Successfully added values to database");
             return true;
         }
     }

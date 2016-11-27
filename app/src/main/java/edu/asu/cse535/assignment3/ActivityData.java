@@ -1,5 +1,7 @@
 package edu.asu.cse535.assignment3;
 
+import java.io.Serializable;
+
 /**
  * Copyright 2016 Gowtham Ganesh Nayak,
  *
@@ -21,7 +23,7 @@ package edu.asu.cse535.assignment3;
  * @version November 2016
  */
 
-public class ActivityData {
+public class ActivityData implements Serializable {
     private float[] x_values;
     private float[] y_values;
     private float[] z_values;

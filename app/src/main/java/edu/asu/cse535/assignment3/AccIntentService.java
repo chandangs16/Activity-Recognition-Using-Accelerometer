@@ -1,6 +1,5 @@
 package edu.asu.cse535.assignment3;
 
-import android.app.IntentService;
 import android.app.Service;
 import android.content.Intent;
 import android.content.Context;
@@ -16,36 +15,31 @@ import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
-
-
-import java.util.ArrayList;
-
-/**
- * An {@link IntentService} subclass for handling asynchronous task requests in
- * a service on a separate handler thread.
- * <p>
- * TODO: Customize class - update intent actions, extra parameters and static
- * helper methods.
- */
 public class AccIntentService  extends Service implements SensorEventListener {
     public final IBinder localBinder = new LocalBinder();
     public Handler handler;
     private Sensor sensor;
     private SensorManager sensorManager;
-    private final int SAMPLE_SIZE = 150;
-    int xvalues[];
-    int yvalues[];
-    int zvalues[];
-
-    private int numSamples = 0;
-    private boolean isActive = false;
-    private double samplingRate = 0.0;
-    public ArrayList<ArrayList<Float>> accelArray = new ArrayList<>();
+    private final int SAMPLE_SIZE = 50;
+    private int count = 0;
+    float xvalues[];
+    float yvalues[];
+    float zvalues[];
+    String activity = "";
+    Intent parentIntent;
 
     public AccIntentService() {
-        xvalues = new int[SAMPLE_SIZE];
-        yvalues = new int[SAMPLE_SIZE];
-        zvalues = new int[SAMPLE_SIZE];
+    }
+
+    @Override
+    public int onStartCommand(Intent intent, int flags, int startId) {
+        Log.w(this.getClass().getSimpleName() , "Service started and values initialized");
+        xvalues = new float[SAMPLE_SIZE];
+        yvalues = new float[SAMPLE_SIZE];
+        zvalues = new float[SAMPLE_SIZE];
+        this.parentIntent = intent;
+        this.activity = intent.getStringExtra("activity");
+        return super.onStartCommand(intent, flags, startId);
     }
 
     public class LocalBinder extends Binder {
@@ -55,75 +49,50 @@ public class AccIntentService  extends Service implements SensorEventListener {
     }
 
     public void onCreate() {
-        Log.w(this.getClass().getSimpleName(), " OnCreate");
-
+        Log.w(this.getClass().getSimpleName(), " Service is created");
         sensorManager = (SensorManager)  getSystemService(Context.SENSOR_SERVICE);
         sensor  = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sensorManager.registerListener((SensorEventListener) this, sensor, 100000);
-
-    }
-
-    public void startRecording() {
-
-        numSamples = 0;
-        isActive = true;
-    }
-
-    public boolean isActive() {
-        return isActive;
+        sensorManager.registerListener((SensorEventListener) this, sensor, 1000000);
     }
 
     @Override
     public void onSensorChanged(SensorEvent event) {
-
-        if (handler != null && isActive()) {
-
+        Log.w(this.getClass().getSimpleName() , "Value sensed");
+        if (handler != null ) {
             float x = event.values[0];
             float y = event.values[1];
             float z = event.values[2];
 
-            numSamples++;
-            long now = System.currentTimeMillis();
-            if (numSamples > 50) {
-
-                isActive = false;
-                Message msg = handler.obtainMessage();
-                float[] xAccelArray = new float[accelArray.get(0).size()];
-                float[] yAccelArray = new float[accelArray.get(1).size()];
-                float[] zAccelArray = new float[accelArray.get(2).size()];
-                int i = 0;
-                for(Float f: accelArray.get(0)){
-                    xAccelArray[i++] = (f != null ? f : 0.0f);
-                }
-                i = 0;
-                for(Float f: accelArray.get(1)) {
-                    yAccelArray[i++] = (f != null ? f : 0.0f);
-                }
-                i = 0;
-                for(Float f: accelArray.get(3)) {
-                    zAccelArray[i++] = (f != null ? f: 0.0f);
-                }
-
-                Bundle b = new Bundle();
-                b.putFloatArray("XAccelVals", xAccelArray);
-                b.putFloatArray("YAccelVals", yAccelArray);
-                b.putFloatArray("ZAccelVals", zAccelArray);
-                msg.setData(b);
-                handler.sendMessage(msg);
-                numSamples = 0;
-                accelArray.get(0).clear();
-                accelArray.get(1).clear();
-                accelArray.get(2).clear();
-
+            if (count < 50) {
+                Log.w(this.getClass().getSimpleName() , "Values getting added to array" + String.valueOf(count));
+                xvalues[count] = x;
+                yvalues[count] = y;
+                zvalues[count] = z;
+                count++;
             }
             else{
-                accelArray.get(0).add(x);
-                accelArray.get(1).add(y);
-                accelArray.get(2).add(z);
+                Log.w(this.getClass().getSimpleName() , " Finished collecting activity data");
+                // stop the service after the completion of this if.
+                ActivityData activityData = new ActivityData(xvalues, yvalues, zvalues, activity);
 
+                xvalues = new float[SAMPLE_SIZE];
+                yvalues = new float[SAMPLE_SIZE];
+                zvalues = new float[SAMPLE_SIZE];
+
+                Log.w(this.getClass().getSimpleName() , "Message is being sent back to handler");
+                Message msg = handler.obtainMessage();
+                Bundle b = new Bundle();
+                b.putSerializable("ActivityData", activityData);
+                msg.setData(b);
+
+                handler.sendMessage(msg);
+                count = 0;
+                stopSelf();
             }
         }
     }
+
+
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -133,5 +102,19 @@ public class AccIntentService  extends Service implements SensorEventListener {
     @Override
     public void onAccuracyChanged(Sensor sensor, int accuracy) {
 
+    }
+
+    public void setHandler(Handler handler)
+    {
+        this.handler = handler;
+
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Toast.makeText(this, "service onDestroy", Toast.LENGTH_LONG).show();
+//        Utils.cancelNotification(this);
+        handler.removeCallbacksAndMessages(null);
     }
 }
