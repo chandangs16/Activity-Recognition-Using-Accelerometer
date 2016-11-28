@@ -45,9 +45,9 @@ public class ActivityPublishHelper {
 
     private String formatData(ActivityData activityData) {
         StringBuilder data = new StringBuilder();
-        data.append(getLabel(activityData.getActivity()));
-        data.append(" ");
         for(int i = 0; i<50; i++) {
+            data.append(getLabel(activityData.getActivity()));
+            data.append(" ");
             data.append("1:");
             data.append(activityData.getX_values()[i]);
             data.append(" ");
@@ -57,8 +57,9 @@ public class ActivityPublishHelper {
             data.append("3:");
             data.append(activityData.getZ_values()[i]);
             data.append(" ");
+            data.append(System.lineSeparator());
         }
-        data.append(System.lineSeparator());
+
         return data.toString();
     }
 
