@@ -47,6 +47,7 @@ public class ActivityPublishHelper {
         StringBuilder data = new StringBuilder();
         data.append(getLabel(activityData.getActivity()));
         data.append(" ");
+
         int count= 0;
         for(int i = 0; i<50; i++) {
             count+=1;
@@ -61,9 +62,15 @@ public class ActivityPublishHelper {
             data.append(count+":");
             data.append(activityData.getZ_values()[i]);
             data.append(" ");
+            data.append(System.lineSeparator());
         }
-        data.append(System.lineSeparator());
+
         return data.toString();
+    }
+
+    public static void clearFile() {
+        File file = new File(Constants.TRAINING_DATA_FILE);
+        file.delete();
     }
 
     private int getLabel(String label){
