@@ -19,7 +19,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".AndroidLibsvmExampleActivity">
+        <activity android:name=".AndroidLibsvmClassifier">
         </activity>
         <service
             android:name=".AccIntentService"

@@ -13,9 +13,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-public class AndroidLibsvmExampleActivity extends Activity {
+public class AndroidLibsvmClassifier {
     /** Called when the activity is first created. */
-    private static final String TAG = "Libsvm";
+    //private static final String TAG = "Libsvm";
     Intent intent;
 
 
@@ -30,29 +30,7 @@ public class AndroidLibsvmExampleActivity extends Activity {
     }
 
 
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        setContentView(R.layout.main);
-        Button trainButton = (Button)findViewById(R.id.train);
-        Button classifyButton = (Button)findViewById(R.id.classifiy);
-        intent  = getIntent();
-        trainButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                train();
-            }
-        });
-        classifyButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                classify((ActivityData) intent.getSerializableExtra("ActivityData"));
-            }
-        });
-    }
-
-    private void train() {
+    public void train() {
         // Svm training
         int kernelType = 2; // Radial basis function
         int cost = 4; // Cost
@@ -62,11 +40,8 @@ public class AndroidLibsvmExampleActivity extends Activity {
         String modelFileLoc = Constants.MODEL_FILE;
         if (trainClassifierNative(trainingFileLoc, kernelType, cost, gamma, isProb,
                 modelFileLoc) == -1) {
-            Log.w(TAG, "training err");
-            //finish();
         }
         Log.w(this.getClass().getSimpleName(), "Finished training the classifier");
-        Toast.makeText(this, "Training is done", Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -123,28 +98,29 @@ public class AndroidLibsvmExampleActivity extends Activity {
                 SCC = ((total*sumpt-sump*sumt)*(total*sumpt-sump*sumt)) / ((total*sumpp-sump*sump)*(total*sumtt-sumt*sumt)); // Squared correlation coefficient
             }
             accuracy = (float)correct/total*100;
-            Log.d(TAG, "Classification accuracy is " + accuracy);
+            Log.w("afdas", "Classification accuracy is " + accuracy);
         }
 
         return r;
     }
 
-    private void classify(ActivityData activityData) {
+    public String classify(ActivityData activityData) {
         // Svm classification
         float[][] values = new float[1][150];
         float[] xvalues = activityData.getX_values();
         float[] yvalues = activityData.getY_values();
         float[] zvalues = activityData.getZ_values();
+
         float[] ary = new float[150];
 
-        int i=0;
-        int count =0;
+        int i = 0;
+        int count = 0;
         values[0] = ary;
 
         while(i<150) {
-            ary[i++] =xvalues[count];
-            ary[i++] =yvalues[count];
-            ary[i++] =zvalues[count];
+            ary[i++] = xvalues[count];
+            ary[i++] = yvalues[count];
+            ary[i++] = zvalues[count];
             count++;
         }
 
@@ -156,20 +132,23 @@ public class AndroidLibsvmExampleActivity extends Activity {
             ary1[j] = j+1;
         }
 
-        int[] groundTruth = {1};
+        int[] groundTruth = null;
         int[] labels = new int[4];
         double[] probs = new double[4];
         int isProb = 0; // Not probability prediction
         String modelFileLoc = Constants.MODEL_FILE;
 
-        if (callSVM(values, indices, groundTruth, isProb, modelFileLoc, labels, probs) != 0) {
-            Log.w(TAG, "Classification is incorrect");
-        }
-        else {
-            String m = "";
-            for (int l : labels)
-                m += l + ", ";
-            Toast.makeText(this, "Classification is done, the result is " + m, Toast.LENGTH_SHORT).show();
+        int classified =  callSVM(values, indices, groundTruth, isProb, modelFileLoc, labels, probs);
+
+        switch (classified) {
+            case 1:
+                return Constants.ACTIVITY_EATING;
+            case 2:
+                return Constants.ACTIVITY_WALKING;
+            case 3:
+                return Constants.ACTIVITY_RUNNING;
+            default:
+                return "Activity not found";
         }
     }
 }

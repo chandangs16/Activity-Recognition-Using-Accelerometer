@@ -1,7 +1,6 @@
 package edu.asu.cse535.assignment3;
 
 import android.Manifest;
-import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -10,7 +9,6 @@ import android.content.pm.PackageManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
-import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Message;
@@ -22,9 +20,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import java.io.File;
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Date;
 
 import static java.lang.Math.abs;
 
@@ -34,26 +30,27 @@ public class MainActivity extends AppCompatActivity {
     ActivityDatabaseHandler activityDatabaseHandler;
     Intent intent;
     ServiceConnection serve;
-    ArrayList<ActivityData> activityDataArrayList;
+    Intent testIntent;
+    ServiceConnection testServiceConnection;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         verifyStoragePermissions(this);
         activityDatabaseHandler = new ActivityDatabaseHandler(MainActivity.this);
-
         setHandlerForService();
     }
 
-    public void generateTrainingSetFile(View v) {
-        Log.w(this.getClass().getSimpleName(), "Fetched Values from datase");
-        activityDataArrayList = activityDatabaseHandler.getAllActivityDataFromDatabase();
-        Log.w(this.getClass().getSimpleName(), "Fetched Values from datbase");
+    public ArrayList<ActivityData> generateTrainingSetFile() {
+        Log.w(this.getClass().getSimpleName(), "Generating training set");
+        ArrayList<ActivityData> activityDataArrayList = activityDatabaseHandler.getAllActivityDataFromDatabase();
         File file = new File(Constants.TRAINING_DATA_FILE);
         file.delete();
-        for (ActivityData a: activityDataArrayList) {
-            new ActivityPublishHelper(a, this);
+        for (ActivityData activityData: activityDataArrayList) {
+            new ActivityPublishHelper(activityData, this);
         }
+        return activityDataArrayList;
     }
 
     public void setHandlerForService() {
@@ -160,10 +157,56 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void onTrain(View v) {
-        Intent intent = new Intent(MainActivity.this, AndroidLibsvmExampleActivity.class);
-        intent.putExtra("ActivityData", activityDataArrayList.get(0));
-        Log.w(this.getClass().getSimpleName(), activityDataArrayList.get(0).getActivity());
-        startActivity(intent);
+        ArrayList<ActivityData> activityDataArrayList = generateTrainingSetFile();
+       if (activityDataArrayList.size() > 0) {
+               AndroidLibsvmClassifier androidLibsvmClassifier = new AndroidLibsvmClassifier();
+               androidLibsvmClassifier.train();
+       } else {
+           Log.w(this.getClass().getSimpleName(), "Insufficient Data");
+       }
+    }
+
+    public void classifyActivity(View v) {
+        final Handler testHandler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                Log.w(this.getClass().getSimpleName() , "Message received and stopping service");
+
+                Bundle b = msg.getData();
+                ActivityData activityData = (ActivityData) b.getSerializable("ActivityData");
+
+                notifyCompletion();
+                stopService(testIntent);
+                unbindService(testServiceConnection);
+
+                AndroidLibsvmClassifier androidLibsvmClassifier = new AndroidLibsvmClassifier();
+                String activity = androidLibsvmClassifier.classify(activityData);
+                toastActivity(activity);
+            }
+        };
+
+        testIntent = new Intent(MainActivity.this.getBaseContext(), AccIntentService.class);
+        testIntent.putExtra("activity", Constants.CLASSIFY);
+        testServiceConnection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                AccIntentService testAaccIntentService = ((AccIntentService.LocalBinder) service).getInstance();
+                testAaccIntentService.setHandler(testHandler);
+                Log.w(this.getClass().getSimpleName() , "Test activity is connected to service");
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+
+            }
+        };
+        startService(testIntent);
+
+        bindService(testIntent, testServiceConnection, Context.BIND_AUTO_CREATE);
+    }
+
+    public void   toastActivity(String activity) {
+        Toast.makeText(this, activity, Toast.LENGTH_SHORT).show();
     }
 
     // Storage Permissions

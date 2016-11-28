@@ -87,7 +87,7 @@ static int jniRegisterNativeMethods(JNIEnv *env, const char *className,
 
 
 int register_Signal(JNIEnv *env) {
-    return jniRegisterNativeMethods(env, "info/kunli/androidlibsvmexample/AndroidLibsvmExampleActivity",
+    return jniRegisterNativeMethods(env, "info/kunli/androidlibsvmexample/AndroidLibsvmClassifier",
             sMethods, sizeof(sMethods) / sizeof(sMethods[0]));
 }
 

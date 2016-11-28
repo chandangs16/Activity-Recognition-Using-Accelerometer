@@ -62,9 +62,8 @@ public class ActivityPublishHelper {
             data.append(count+":");
             data.append(activityData.getZ_values()[i]);
             data.append(" ");
-            data.append(System.lineSeparator());
         }
-
+        data.append(System.lineSeparator());
         return data.toString();
     }
 
