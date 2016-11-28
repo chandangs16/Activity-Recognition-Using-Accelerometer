@@ -7,7 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 
 /**
@@ -291,16 +294,16 @@ public class ActivityDatabaseHandler extends SQLiteOpenHelper {
      * @throws IOException
      */
     public void copyDatabase() throws IOException {
-//        InputStream inputStream = context.getResources().openRawResource(R.raw.movie_description);
-//        String database = DATABASE_PATH + DATABASE_NAME;
-//        OutputStream outputStream = new FileOutputStream(database);
-//        byte[] buffer = new byte[1024];
-//        int length;
-//        while ((length = inputStream.read(buffer)) > 0) {
-//            outputStream.write(buffer, 0, length);
-//        }
-//        outputStream.flush();
-//        outputStream.close();
-//        inputStream.close();
+        InputStream inputStream = context.getResources().openRawResource(R.raw.activity_description);
+        String database = DATABASE_PATH + DATABASE_NAME;
+        OutputStream outputStream = new FileOutputStream(database);
+        byte[] buffer = new byte[1024];
+        int length;
+        while ((length = inputStream.read(buffer)) > 0) {
+            outputStream.write(buffer, 0, length);
+        }
+        outputStream.flush();
+        outputStream.close();
+        inputStream.close();
     }
 }

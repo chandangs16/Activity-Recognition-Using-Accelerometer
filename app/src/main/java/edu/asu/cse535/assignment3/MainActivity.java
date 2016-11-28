@@ -23,6 +23,7 @@ import android.widget.Toast;
 
 import java.io.File;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Date;
 
 import static java.lang.Math.abs;
@@ -41,6 +42,15 @@ public class MainActivity extends AppCompatActivity {
         activityDatabaseHandler = new ActivityDatabaseHandler(MainActivity.this);
 
         setHandlerForService();
+    }
+
+    public void generateTrainingSetFile(View v) {
+        ArrayList<ActivityData> activityDataArayList = activityDatabaseHandler.getAllActivityDataFromDatabase();
+        File file = new File(Constants.TRAINING_DATA_FILE);
+        file.delete();
+        for (ActivityData a: activityDataArayList) {
+            new ActivityPublishHelper(a, this);
+        }
     }
 
     public void setHandlerForService() {
