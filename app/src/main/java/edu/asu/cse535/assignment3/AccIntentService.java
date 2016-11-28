@@ -76,7 +76,7 @@ public class AccIntentService  extends Service implements SensorEventListener {
 
             if (count < 50) {
                 long currentTimestamp = System.currentTimeMillis();
-                if (currentTimestamp-previousTimestamp >= 100) {
+                if (currentTimestamp-previousTimestamp >= 50) {
                     previousTimestamp = currentTimestamp;
                     Log.w(this.getClass().getSimpleName() , "Values getting added to array" + String.valueOf(count));
                     xvalues[count] = x;
