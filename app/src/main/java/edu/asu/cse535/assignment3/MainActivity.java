@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
                 notifyCompletion();
                 Toast.makeText(MainActivity.this, "Activity added to Database", Toast.LENGTH_SHORT).show();
-                Log.w("writeToFile", new ActivityPublishHelper(activityData, getApplicationContext()).toString());
+                new ActivityPublishHelper(activityData, getApplicationContext());
             }
         };
     }
@@ -145,6 +145,12 @@ public class MainActivity extends AppCompatActivity {
 
         bindService(intent, serve, Context.BIND_AUTO_CREATE);
     }
+
+    public void onTrain(View v) {
+        Intent intent = new Intent(MainActivity.this, AndroidLibsvmExampleActivity.class);
+        startActivity(intent);
+    }
+
 
     // Storage Permissions
     private static final int REQUEST_EXTERNAL_STORAGE = 1;

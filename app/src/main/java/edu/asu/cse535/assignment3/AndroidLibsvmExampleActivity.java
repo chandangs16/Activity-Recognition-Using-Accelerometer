@@ -54,13 +54,14 @@ public class AndroidLibsvmExampleActivity extends Activity {
         int cost = 4; // Cost
         int isProb = 0;
         float gamma = 0.25f; // Gamma
-        String trainingFileLoc = Environment.getExternalStorageDirectory()+"/Download/training_set";
-        String modelFileLoc = Environment.getExternalStorageDirectory()+"/model";
+        String trainingFileLoc = Constants.TRAINING_DATA_FILE;
+        String modelFileLoc = Constants.MODEL_FILE;
         if (trainClassifierNative(trainingFileLoc, kernelType, cost, gamma, isProb,
                 modelFileLoc) == -1) {
-            Log.d(TAG, "training err");
-            finish();
+            Log.w(TAG, "training err");
+            //finish();
         }
+        Log.w(this.getClass().getSimpleName(), "Finished training the classifier");
         Toast.makeText(this, "Training is done", Toast.LENGTH_SHORT).show();
     }
 

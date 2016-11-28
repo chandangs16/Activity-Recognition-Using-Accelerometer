@@ -16,41 +16,60 @@
         android:text="Hello World!" />
 
     <Button
-        android:text="Eating Button"
+        android:text="Walking"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="69dp"
+        android:id="@+id/button3"
+        android:onClick="onStartRecordingWalking"
+        android:layout_alignBaseline="@+id/button2"
+        android:layout_alignBottom="@+id/button2"
+        android:layout_alignParentEnd="true" />
+
+    <Button
+        android:text="Eating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:id="@+id/button"
-        android:onClick="onStartRecordingEating"/>
+        android:onClick="onStartRecordingEating"
+        android:layout_alignBaseline="@+id/button2"
+        android:layout_alignBottom="@+id/button2"
+        android:layout_toStartOf="@+id/button4"
+        android:layout_marginEnd="29dp" />
 
     <Button
         android:text="Running"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_marginEnd="52dp"
         android:id="@+id/button2"
-        android:onClick="onStartRecordingRunning"/>
+        android:onClick="onStartRecordingRunning"
+        android:layout_marginTop="33dp"
+        android:layout_alignStart="@+id/button4" />
 
     <Button
-        android:text="Walking"
+        android:text="Train"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/button"
-        android:layout_alignStart="@+id/button2"
-        android:layout_marginStart="19dp"
-        android:layout_marginTop="21dp"
-        android:id="@+id/button3"
-        android:onClick="onStartRecordingWalking"/>
+        android:id="@+id/button5"
+        android:layout_alignParentBottom="true"
+        android:layout_toStartOf="@+id/button"
+        android:layout_marginBottom="29dp"
+        android:layout_alignEnd="@+id/button"
+        android:onClick="onTrain"/>
 
     <Button
         android:text="DeleteAll"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/button3"
-        android:layout_alignStart="@+id/button3"
-        android:layout_marginTop="40dp"
         android:id="@+id/button4"
-        android:onClick="clearData"/>
+        android:onClick="clearData"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@+id/button3" />
+
+    <TextView
+        android:text="Train"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/button5"
+        android:layout_toEndOf="@+id/button2"
+        android:id="@+id/textView2" />
 </RelativeLayout>

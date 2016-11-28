@@ -17,13 +17,11 @@ import java.io.OutputStreamWriter;
  */
 
 public class ActivityPublishHelper {
-    public ActivityData activityData;
     public Context context;
 
     public ActivityPublishHelper(ActivityData activityData, Context context) {
-        this.activityData = activityData;
         this.context = context;
-        writeToFile(formatData(this.activityData), this.context);
+        writeToFile(formatData(activityData), this.context);
     }
 
     public boolean writeToFile(String data,Context context) {
@@ -37,10 +35,10 @@ public class ActivityPublishHelper {
 
                 out.close();
                 filewriter.close();
+                Log.w(this.getClass().getSimpleName(), "Successfully added data to file");
                 return true;
-
         } catch (Exception e) {
-            android.util.Log.d("failed to save file", e.toString());
+            Log.w(this.getClass().getSimpleName(), e.toString());
         }
         return false;
     }
@@ -49,7 +47,7 @@ public class ActivityPublishHelper {
         StringBuilder data = new StringBuilder();
         data.append(getLabel(activityData.getActivity()));
         data.append(" ");
-        for(int i = 0; i<50; i++){
+        for(int i = 0; i<50; i++) {
             data.append("1:");
             data.append(activityData.getX_values()[i]);
             data.append(" ");
@@ -72,9 +70,4 @@ public class ActivityPublishHelper {
             default: return 0;
         }
     }
-
-
-
-
-
 }

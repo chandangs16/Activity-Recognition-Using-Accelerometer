@@ -31,7 +31,7 @@ import java.io.IOException;
  * @version November 2016
  */
 public class ActivityDatabaseHandler extends SQLiteOpenHelper {
-    private static final String DATABASE_NAME = "Activity_Description.db";
+    private static final String DATABASE_NAME = "activity_description.db";
     private static final int DATABASE_VERSION = 1;
     private final String DATABASE_PATH = "/data/data/edu.asu.cse535.assignment3/databases/";
     private Context context;
@@ -42,7 +42,11 @@ public class ActivityDatabaseHandler extends SQLiteOpenHelper {
 
         // create and ignore the object since we are setting the static string in activityentry class;
         new ActivityDatabaseContract();
-
+        try {
+            createDatabase();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         //getWritableDatabase();
     }
 
@@ -55,9 +59,10 @@ public class ActivityDatabaseHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         Log.w(this.getClass().getSimpleName(), " OnCreate");
-        db.execSQL(ActivityDatabaseContract.ActivityEntry.TABLE_COLUMN_QUERY_STRING);
+
+        //db.execSQL(ActivityDatabaseContract.ActivityEntry.TABLE_COLUMN_QUERY_STRING);
         Log.w(this.getClass().getSimpleName(), " Table is created");
-        Log.w("Database Query: ", ActivityDatabaseContract.ActivityEntry.TABLE_COLUMN_QUERY_STRING);
+        //Log.w("Database Query: ", ActivityDatabaseContract.ActivityEntry.TABLE_COLUMN_QUERY_STRING);
     }
 
     /**
