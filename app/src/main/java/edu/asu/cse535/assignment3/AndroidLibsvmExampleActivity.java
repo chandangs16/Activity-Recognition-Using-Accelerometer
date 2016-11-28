@@ -5,6 +5,7 @@ package edu.asu.cse535.assignment3;
  */
 
 import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
@@ -15,6 +16,8 @@ import android.widget.Toast;
 public class AndroidLibsvmExampleActivity extends Activity {
     /** Called when the activity is first created. */
     private static final String TAG = "Libsvm";
+    Intent intent;
+
 
     // svm native
     private native int trainClassifierNative(String trainingFile, int kernelType,
@@ -26,6 +29,7 @@ public class AndroidLibsvmExampleActivity extends Activity {
         System.loadLibrary("signal");
     }
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,7 +37,7 @@ public class AndroidLibsvmExampleActivity extends Activity {
         setContentView(R.layout.main);
         Button trainButton = (Button)findViewById(R.id.train);
         Button classifyButton = (Button)findViewById(R.id.classifiy);
-
+        intent  = getIntent();
         trainButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -43,7 +47,7 @@ public class AndroidLibsvmExampleActivity extends Activity {
         classifyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                classify();
+                classify((ActivityData) intent.getSerializableExtra("ActivityData"));
             }
         });
     }
@@ -125,28 +129,41 @@ public class AndroidLibsvmExampleActivity extends Activity {
         return r;
     }
 
-    private void classify() {
+    private void classify(ActivityData activityData) {
         // Svm classification
-        float[][] values = {
-                {0.708333f, 1, 1, -0.320755f, -0.105023f, -1, 1, -0.419847f, -1, -0.225806f, 1, -1 },
-                {0.583333f, -1, 0.333333f, -0.603774f, 1, -1, 1, 0.358779f, -1, -0.483871f, -1, 1},
-                {0.166667f, 1, -0.333333f, -0.433962f, -0.383562f, -1, -1, 0.0687023f, -1, -0.903226f, -1, 1},
-                {0.458333f, 1, 1, -0.358491f, -0.374429f, -1, 1, -0.480916f, 1, -0.935484f, -0.333333f, 1 },
-        };
-        int[][] indices = {
-                {1,2,3,4,5,6,7,8,9,10,12,13},
-                {1,2,3,4,5,6,7,8,9,10,12,13},
-                {1,2,3,4,5,6,7,8,9,10,12,13},
-                {1,2,3,4,5,6,7,8,9,10,12,13}
-        };
-        int[] groundTruth = null;
+        float[][] values = new float[1][150];
+        float[] xvalues = activityData.getX_values();
+        float[] yvalues = activityData.getY_values();
+        float[] zvalues = activityData.getZ_values();
+        float[] ary = new float[150];
+
+        int i=0;
+        int count =0;
+        values[0] = ary;
+
+        while(i<150) {
+            ary[i++] =xvalues[count];
+            ary[i++] =yvalues[count];
+            ary[i++] =zvalues[count];
+            count++;
+        }
+
+        int[][] indices = new int [1][150];
+        int[] ary1 = new int [150];
+
+        indices[0] = ary1;
+        for(int j=0;j<150;j++) {
+            ary1[j] = j+1;
+        }
+
+        int[] groundTruth = {1};
         int[] labels = new int[4];
         double[] probs = new double[4];
         int isProb = 0; // Not probability prediction
-        String modelFileLoc = Environment.getExternalStorageDirectory()+"/model";
+        String modelFileLoc = Constants.MODEL_FILE;
 
         if (callSVM(values, indices, groundTruth, isProb, modelFileLoc, labels, probs) != 0) {
-            Log.d(TAG, "Classification is incorrect");
+            Log.w(TAG, "Classification is incorrect");
         }
         else {
             String m = "";

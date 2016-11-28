@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -274,7 +275,11 @@ public class ActivityDatabaseHandler extends SQLiteOpenHelper {
         SQLiteDatabase sqLiteDatabase = null;
         String database = DATABASE_PATH + DATABASE_NAME;
         try {
-            sqLiteDatabase = SQLiteDatabase.openDatabase(database, null, SQLiteDatabase.OPEN_READONLY);
+            File dbfile = new File(database);
+            if (!dbfile.exists()) {
+                copyDatabase();
+            }
+            //sqLiteDatabase = SQLiteDatabase.openDatabase(database, null, SQLiteDatabase.OPEN_READONLY);
             Log.w(this.getClass().getSimpleName(), "Database exists");
         } catch (Exception e) {
             Log.w(this.getClass().getSimpleName(), "Database doesn't exist");

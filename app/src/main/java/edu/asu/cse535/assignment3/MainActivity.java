@@ -34,6 +34,7 @@ public class MainActivity extends AppCompatActivity {
     ActivityDatabaseHandler activityDatabaseHandler;
     Intent intent;
     ServiceConnection serve;
+    ArrayList<ActivityData> activityDataArrayList;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,10 +46,12 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void generateTrainingSetFile(View v) {
-        ArrayList<ActivityData> activityDataArayList = activityDatabaseHandler.getAllActivityDataFromDatabase();
+        Log.w(this.getClass().getSimpleName(), "Fetched Values from datase");
+        activityDataArrayList = activityDatabaseHandler.getAllActivityDataFromDatabase();
+        Log.w(this.getClass().getSimpleName(), "Fetched Values from datbase");
         File file = new File(Constants.TRAINING_DATA_FILE);
         file.delete();
-        for (ActivityData a: activityDataArayList) {
+        for (ActivityData a: activityDataArrayList) {
             new ActivityPublishHelper(a, this);
         }
     }
@@ -158,9 +161,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void onTrain(View v) {
         Intent intent = new Intent(MainActivity.this, AndroidLibsvmExampleActivity.class);
+        intent.putExtra("ActivityData", activityDataArrayList.get(0));
+        Log.w(this.getClass().getSimpleName(), activityDataArrayList.get(0).getActivity());
         startActivity(intent);
     }
-
 
     // Storage Permissions
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
