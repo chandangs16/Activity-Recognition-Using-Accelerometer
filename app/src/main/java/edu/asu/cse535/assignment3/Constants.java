@@ -10,4 +10,5 @@ public class Constants {
     public static final String ACTIVITY_WALKING  = "WALKING";
     public static final String ACTIVITY_RUNNING  = "RUNNING";
     public static final String MODEL_FILE = "/sdcard/model";
+    public static final int SAMPLE_SIZE = 50;
 }

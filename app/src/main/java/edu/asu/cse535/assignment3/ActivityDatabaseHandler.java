@@ -2,11 +2,13 @@ package edu.asu.cse535.assignment3;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 /**
  * Copyright 2016 Gowtham Ganesh Nayak,
@@ -185,15 +187,15 @@ public class ActivityDatabaseHandler extends SQLiteOpenHelper {
      * @return ArrayList of Movie
      */
     // Change this to be compatible with the getAllMovieCellInformationDatabase() method
-   /* public ArrayList<Movie> getAllMovieInformationFromDatabase() {
-        ArrayList<Movie> moviesArrayList = new ArrayList<>();
+    public ArrayList<ActivityData> getAllActivityDataFromDatabase() {
+        ArrayList<ActivityData> activityArrayList = new ArrayList<>();
         SQLiteDatabase db = getWritableDatabase();
 
-        String querySelection = "SELECT * FROM " + MovieDatabaseContract.MovieEntry.TABLE_NAME + " WHERE 1";
+        String querySelection = "SELECT * FROM " + ActivityDatabaseContract.ActivityEntry.TABLE_NAME + " WHERE 1";
         Cursor cursor = db.rawQuery(querySelection, null);
 
         if (cursor == null) {
-            Log.w(this.getClass().getSimpleName(), " getAllMovieInformationFromDatabase() Unsuccessful Query");
+            Log.w(this.getClass().getSimpleName(), " getAllActivityFromDatabase() Unsuccessful Query");
             db.close();
             return null;
         }
@@ -204,36 +206,38 @@ public class ActivityDatabaseHandler extends SQLiteOpenHelper {
             db.close();
             return null;
         } else {
-            Log.w(this.getClass().getSimpleName(), " getAllMovieInformationFromDatabase() Successful Query");
+            Log.w(this.getClass().getSimpleName(), " getAllActivityDataInformationFromDatabase() Successful Query");
             cursor.moveToFirst();
 
             while (!cursor.isAfterLast()) {
-                Movie movie = getMovieFromCursor(cursor);
-                moviesArrayList.add(movie);
+                ActivityData activityData = getActivityDataFromCursor(cursor);
+                activityArrayList.add(activityData);
                 cursor.moveToNext();
             }
 
             // Close the cursor first before closing the database. Else cursor will be invalid.
             cursor.close();
             db.close();
-            return moviesArrayList;
+            return activityArrayList;
         }
-    }*/
+    }
 
 
-    /*private Movie getMovieFromCursor(Cursor cursor) {
-        String id = cursor.getString(cursor.getColumnIndex(MovieDatabaseContract.MovieEntry.MOVIE_ID));
-        String title = cursor.getString(cursor.getColumnIndex(MovieDatabaseContract.MovieEntry.MOVIE_TITLE));
-        String year = cursor.getString(cursor.getColumnIndex(MovieDatabaseContract.MovieEntry.MOVIE_YEAR));
-        String rated = cursor.getString(cursor.getColumnIndex(MovieDatabaseContract.MovieEntry.MOVIE_RATED));
-        String released = cursor.getString(cursor.getColumnIndex(MovieDatabaseContract.MovieEntry.MOVIE_RELEASED));
-        String runtime = cursor.getString(cursor.getColumnIndex(MovieDatabaseContract.MovieEntry.MOVIE_RUNTIME));
-        String genre = cursor.getString(cursor.getColumnIndex(MovieDatabaseContract.MovieEntry.MOVIE_GENRE));
-        String actors = cursor.getString(cursor.getColumnIndex(MovieDatabaseContract.MovieEntry.MOVIE_ACTORS));
-        String plot = cursor.getString(cursor.getColumnIndex(MovieDatabaseContract.MovieEntry.MOVIE_PLOT));
-        String poster = cursor.getString(cursor.getColumnIndex(MovieDatabaseContract.MovieEntry.MOVIE_POSTER));
-        return new Movie(id, title, year, rated, released, runtime, genre, actors, plot, poster);
-    }*/
+    private ActivityData getActivityDataFromCursor(Cursor cursor) {
+        float[] xvalues = new float[Constants.SAMPLE_SIZE];
+        float[] yvalues = new float[Constants.SAMPLE_SIZE];
+        float[] zvalues = new float[Constants.SAMPLE_SIZE];
+
+        for (int i=0;i <xvalues.length;i++) {
+            xvalues[i] = cursor.getFloat(cursor.getColumnIndex(ActivityDatabaseContract.ActivityEntry.ACCEL_X + String.valueOf(i+1)));
+            yvalues[i] = cursor.getFloat(cursor.getColumnIndex(ActivityDatabaseContract.ActivityEntry.ACCEL_Y + String.valueOf(i+1)));
+            zvalues[i] = cursor.getFloat(cursor.getColumnIndex(ActivityDatabaseContract.ActivityEntry.ACCEL_Z + String.valueOf(i+1)));
+        }
+
+        String activityLabel = cursor.getString(cursor.getColumnIndex(ActivityDatabaseContract.ActivityEntry.ACTIVITY_LABEL));
+
+        return new ActivityData(xvalues, yvalues,zvalues, activityLabel);
+    }
 
     /**
      * Uses existing database. Else copies from raw folder.

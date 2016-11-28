@@ -22,7 +22,6 @@ public class AccIntentService  extends Service implements SensorEventListener {
     public Handler handler;
     private Sensor sensor;
     private SensorManager sensorManager;
-    private final int SAMPLE_SIZE = 50;
     private int count = 0;
     float xvalues[];
     float yvalues[];
@@ -38,9 +37,9 @@ public class AccIntentService  extends Service implements SensorEventListener {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Log.w(this.getClass().getSimpleName() , "Service started and values initialized");
-        xvalues = new float[SAMPLE_SIZE];
-        yvalues = new float[SAMPLE_SIZE];
-        zvalues = new float[SAMPLE_SIZE];
+        xvalues = new float[Constants.SAMPLE_SIZE];
+        yvalues = new float[Constants.SAMPLE_SIZE];
+        zvalues = new float[Constants.SAMPLE_SIZE];
         this.parentIntent = intent;
         this.activity = intent.getStringExtra("activity");
         sensorManager.registerListener((SensorEventListener) this, sensor, 1000000);
@@ -90,9 +89,9 @@ public class AccIntentService  extends Service implements SensorEventListener {
                 // stop the service after the completion of this if.
                 ActivityData activityData = new ActivityData(xvalues, yvalues, zvalues, activity);
 
-                xvalues = new float[SAMPLE_SIZE];
-                yvalues = new float[SAMPLE_SIZE];
-                zvalues = new float[SAMPLE_SIZE];
+                xvalues = new float[Constants.SAMPLE_SIZE];
+                yvalues = new float[Constants.SAMPLE_SIZE];
+                zvalues = new float[Constants.SAMPLE_SIZE];
 
                 Log.w(this.getClass().getSimpleName() , "Message is being sent back to handler");
                 Message msg = handler.obtainMessage();
