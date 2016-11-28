@@ -45,22 +45,31 @@ public class ActivityPublishHelper {
 
     private String formatData(ActivityData activityData) {
         StringBuilder data = new StringBuilder();
+        data.append(getLabel(activityData.getActivity()));
+        data.append(" ");
+        int count = 0;
         for(int i = 0; i<50; i++) {
-            data.append(getLabel(activityData.getActivity()));
-            data.append(" ");
-            data.append("1:");
+            count+=1;
+            data.append(count + ":");
             data.append(activityData.getX_values()[i]);
             data.append(" ");
-            data.append("2:");
+            count+=1;
+            data.append(count+":");
             data.append(activityData.getY_values()[i]);
             data.append(" ");
-            data.append("3:");
+            count+=1;
+            data.append(count+":");
             data.append(activityData.getZ_values()[i]);
             data.append(" ");
             data.append(System.lineSeparator());
         }
 
         return data.toString();
+    }
+
+    public static void clearFile() {
+        File file = new File(Constants.TRAINING_DATA_FILE);
+        file.delete();
     }
 
     private int getLabel(String label){
