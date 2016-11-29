@@ -32,7 +32,7 @@ public class AndroidLibsvmClassifier {
 
     public void train() {
         // Svm training
-        int kernelType = 2; // Radial basis function
+        int kernelType = 4; // Radial basis function
         int cost = 4; // Cost
         int isProb = 0;
         float gamma = 0.25f; // Gamma
