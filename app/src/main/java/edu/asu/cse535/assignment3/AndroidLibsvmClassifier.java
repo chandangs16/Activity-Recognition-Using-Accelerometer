@@ -191,10 +191,9 @@ public class AndroidLibsvmClassifier {
         int[] labels = new int[9];
         double[] probs = new double[9];
         int isProb = 0; // Not probability prediction
-        String modelFileLoc = Environment.getExternalStorageDirectory()+"/model";
+        String modelFileLoc = Constants.MODEL_FILE;
         float accuracy = callSVMForTestingAccuracy(values, indices, groundTruth, isProb, modelFileLoc, labels, probs);
         return accuracy;
-
     }
 
     public float callSVMForTestingAccuracy(float values[][], int indices[][], int groundTruth[], int isProb, String modelFile,
