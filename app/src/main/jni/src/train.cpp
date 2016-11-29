@@ -9,8 +9,8 @@
 #define PARA_LEN 12 // Max length for each parameter
 
 int train(const char *trainingFile, int kernelType, int cost, float gamma,
-        int isProb, const char *modelFile) {
-    int cmdLen = 13;
+          int isProb, const char *modelFile) {
+    int cmdLen = 11;
     char *cmd[cmdLen];
 
     cmd[0] = "donotcare";
@@ -31,19 +31,15 @@ int train(const char *trainingFile, int kernelType, int cost, float gamma,
     cmd[8] = (char *)calloc(PARA_LEN, sizeof(char));
     sprintf(cmd[8], "%d", isProb);
 
-    cmd[9] = "-v";
-    cmd[10] = (char *)calloc(PARA_LEN, sizeof(char));
-    sprintf(cmd[10], "%d", 3);
-	
     int len = strlen(trainingFile);
-    cmd[11] = (char *)calloc(len+1, sizeof(char));
-    strncpy(cmd[11], trainingFile, len);
-    cmd[11][len] = '\0';
+    cmd[9] = (char *)calloc(len+1, sizeof(char));
+    strncpy(cmd[9], trainingFile, len);
+    cmd[9][len] = '\0';
 
     len = strlen(modelFile);
-    cmd[12] = (char *)calloc(len+1, sizeof(char));
-    strncpy(cmd[12], modelFile, len);
-    cmd[12][len] = '\0';
+    cmd[10] = (char *)calloc(len+1, sizeof(char));
+    strncpy(cmd[10], modelFile, len);
+    cmd[10][len] = '\0';
 
     int result = svmtrain(cmdLen, cmd);
 
@@ -52,8 +48,8 @@ int train(const char *trainingFile, int kernelType, int cost, float gamma,
         free(cmd[i]);
         cmd[i] = NULL;
     }
-    free(cmd[11]);
-    cmd[11] = NULL;
+    free(cmd[9]);
+    cmd[9] = NULL;
 
     return result;
 }
