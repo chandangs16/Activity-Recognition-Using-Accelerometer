@@ -17,13 +17,34 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
 
 import static java.lang.Math.abs;
-
+/**
+ * Copyright 2016 Gowtham Ganesh Nayak,
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ * Purpose: Main activity to collect data, train classifier, build the model, detect live activity
+ * and test the models accuracy.
+ *
+ * @author Gowtham Ganesh Nayak mailto:gnayak2@asu.edu
+ * @version November 2016
+ */
 public class MainActivity extends AppCompatActivity {
     AccIntentService accIntentService;
     Handler handler;
@@ -32,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     ServiceConnection serve;
     Intent testIntent;
     ServiceConnection testServiceConnection;
+    TextView accuracy;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         verifyStoragePermissions(this);
         activityDatabaseHandler = new ActivityDatabaseHandler(MainActivity.this);
         setHandlerForService();
+        accuracy = (TextView) findViewById(R.id.accuracyTextView);
     }
 
     public ArrayList<ActivityData> generateTrainingSetFile() {
@@ -52,6 +75,11 @@ public class MainActivity extends AppCompatActivity {
         }
         return activityDataArrayList;
     }
+
+    public void createTestDatabase(View v){
+//        activityDatabaseHandler.createTestDatabase();
+    }
+
 
     public void setHandlerForService() {
         handler = new Handler() {
@@ -205,8 +233,23 @@ public class MainActivity extends AppCompatActivity {
         bindService(testIntent, testServiceConnection, Context.BIND_AUTO_CREATE);
     }
 
-    public void   toastActivity(String activity) {
+/*    public void classifyActivity(View v) {
+        AndroidLibsvmClassifier androidLibsvmClassifier = new AndroidLibsvmClassifier();
+        ArrayList<ActivityData> activityDataArrayList = activityDatabaseHandler.getAllActivityDataFromDatabase();
+        String activity = androidLibsvmClassifier.classify(activityDataArrayList.get(40));
+        Log.w("Activity Label ", activityDataArrayList.get(40).getActivity());
+        toastActivity(activity);
+    }*/
+
+    public void  toastActivity(String activity) {
         Toast.makeText(this, activity, Toast.LENGTH_SHORT).show();
+    }
+
+    public void onTestAccuracy(View v) {
+        AndroidLibsvmClassifier classifier = new AndroidLibsvmClassifier();
+        float accuracyOfModel = classifier.testAccuracy();
+        Log.w("Accuracy", String.valueOf(accuracyOfModel));
+        accuracy.setText(String.valueOf(accuracyOfModel));
     }
 
     // Storage Permissions

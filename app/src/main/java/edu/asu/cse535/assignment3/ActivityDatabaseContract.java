@@ -17,11 +17,8 @@ package edu.asu.cse535.assignment3;
  *
  * Purpose: A contract class which holds database table information.
  *
- * SER598 Mobile Applications
- * see http://pooh.poly.asu.edu/Mobile
- *
  * @author Gowtham Ganesh Nayak mailto:gnayak2@asu.edu
- * @version March 2016
+ * @version November 2016
  */
 public class ActivityDatabaseContract {
     ActivityDatabaseContract() {

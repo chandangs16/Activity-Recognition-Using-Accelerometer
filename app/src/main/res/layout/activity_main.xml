@@ -65,16 +65,8 @@
         android:layout_centerVertical="true"
         android:layout_toStartOf="@+id/button3" />
 
-    <TextView
-        android:text="Train"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/button5"
-        android:layout_toEndOf="@+id/button2"
-        android:id="@+id/textView2" />
-
     <Button
-        android:text="Test"
+        android:text="Classify"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignBottom="@+id/button5"
@@ -82,5 +74,33 @@
         android:layout_marginStart="40dp"
         android:id="@+id/button6"
         android:onClick="classifyActivity"/>
+
+    <TextView
+        android:text="Accuracy:"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/button4"
+        android:layout_alignStart="@+id/button"
+        android:layout_marginBottom="52dp"
+        android:id="@+id/textView" />
+
+    <TextView
+        android:text="-"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignTop="@+id/textView"
+        android:layout_toEndOf="@+id/button5"
+        android:id="@+id/accuracyTextView" />
+
+    <Button
+        android:text="TestAccuracy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/button4"
+        android:layout_alignStart="@+id/button6"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="34dp"
+        android:id="@+id/button7"
+        android:onClick="onTestAccuracy"/>
 
 </RelativeLayout>

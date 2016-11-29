@@ -38,6 +38,7 @@ import java.util.ArrayList;
  */
 public class ActivityDatabaseHandler extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "activity_description.db";
+    private static final String TEST_DATABASE_NAME = "activity_description.db";
     private static final int DATABASE_VERSION = 1;
     private final String DATABASE_PATH = "/data/data/edu.asu.cse535.assignment3/databases/";
     private Context context;
@@ -65,10 +66,6 @@ public class ActivityDatabaseHandler extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         Log.w(this.getClass().getSimpleName(), " OnCreate");
-
-        //db.execSQL(ActivityDatabaseContract.ActivityEntry.TABLE_COLUMN_QUERY_STRING);
-        Log.w(this.getClass().getSimpleName(), " Table is created");
-        //Log.w("Database Query: ", ActivityDatabaseContract.ActivityEntry.TABLE_COLUMN_QUERY_STRING);
     }
 
     /**
@@ -272,25 +269,18 @@ public class ActivityDatabaseHandler extends SQLiteOpenHelper {
      * @return True if present else False.
      */
     public boolean checkIfDatabaseExists() {
-        SQLiteDatabase sqLiteDatabase = null;
         String database = DATABASE_PATH + DATABASE_NAME;
         try {
             File dbfile = new File(database);
-            if (!dbfile.exists()) {
-                copyDatabase();
+            if (dbfile.exists()) {
+                Log.w(this.getClass().getSimpleName(), "Database exists");
+                return true;
             }
-            //sqLiteDatabase = SQLiteDatabase.openDatabase(database, null, SQLiteDatabase.OPEN_READONLY);
-            Log.w(this.getClass().getSimpleName(), "Database exists");
         } catch (Exception e) {
             Log.w(this.getClass().getSimpleName(), "Database doesn't exist");
         }
-
-        if (sqLiteDatabase != null) {
-            sqLiteDatabase.close();
-            return true;
-        } else {
-            return false;
-        }
+        Log.w(this.getClass().getSimpleName(), "Database doesn't exists");
+        return false;
     }
 
     /**
